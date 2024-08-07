@@ -33,9 +33,11 @@ export default function Home() {
   const [locations, setLocations] = useState<Location[]>([]);
   const [showCloseUnits, setShowCloseUnits] = useState<boolean>(false);
   const [periodSelected, setPeriodSelected] = useState<string | null>(null);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
 
   const fetchLocations = async () => {
     try {
+      setIsLoading(true);
       const response = await fetch(
         "https://test-frontend-developer.s3.amazonaws.com/data/locations.json"
       );
@@ -43,6 +45,8 @@ export default function Home() {
       return data.locations;
     } catch (error) {
       console.error("Failed to fetch location", error);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -217,92 +221,98 @@ export default function Home() {
 
         <Legend />
 
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4 gap-7 mb-20">
-          {locations.map((location, index) => {
-            const isOpen = location.opened === true ? "Aberto" : "Fechado";
-            return (
-              <div
-                key={index}
-                className="bg-gray-100 flex flex-col p-5 shadow-inner rounded-md"
-              >
+        {isLoading === true ? (
+          <div className="flex w-full justify-center h-20 items-center text-center">
+            is Loading...
+          </div>
+        ) : (
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 mt-4 gap-7 mb-20">
+            {locations.map((location, index) => {
+              const isOpen = location.opened === true ? "Aberto" : "Fechado";
+              return (
                 <div
-                  className={`font-semibold ${
-                    isOpen === "Aberto" ? "text-[#2FC022]" : "text-[#dc0a17]"
-                  }`}
+                  key={index}
+                  className="bg-gray-100 flex flex-col p-5 shadow-inner rounded-md"
                 >
-                  {isOpen}
-                </div>
-                <div className="mt-1 font-semibold text-2xl text-[#333333]">
-                  {location.title}
-                </div>
-                {"opened" in location ? (
-                  <>
-                    <div className="h-[2px] w-full flex bg-gray-300 my-3" />
-                    <div
-                      className="text-gray-500 mt-3 text-sm"
-                      dangerouslySetInnerHTML={{ __html: location.content }}
-                    />
-                    <div className="flex flex-row justify-between gap-2 mt-3">
-                      <Image
-                        alt="mask-icon"
-                        src={`/images/${getImageSrc(
-                          "mask",
-                          location.mask
-                        )}.png`}
-                        width={60}
-                        height={60}
-                      />
-                      <Image
-                        alt="towel-icon"
-                        src={`/images/${getImageSrc(
-                          "towel",
-                          location.towel
-                        )}.png`}
-                        width={60}
-                        height={60}
-                      />
-                      <Image
-                        alt="fountain-icon"
-                        src={`/images/${getImageSrc(
-                          "fountain",
-                          location.fountain
-                        )}.png`}
-                        width={60}
-                        height={60}
-                      />
-                      <Image
-                        alt="lockerroom-icon"
-                        src={`/images/${getImageSrc(
-                          "locker_room",
-                          location.locker_room
-                        )}.png`}
-                        width={60}
-                        height={60}
-                      />
-                    </div>
-                  </>
-                ) : (
-                  <div className="text-sm text-gray-500 mt-4">
-                    {location.street} {location.region} {location.city_name}{" "}
-                    {location.state_name} {location.uf}
+                  <div
+                    className={`font-semibold ${
+                      isOpen === "Aberto" ? "text-[#2FC022]" : "text-[#dc0a17]"
+                    }`}
+                  >
+                    {isOpen}
                   </div>
-                )}
-                <div className="grid grid-cols-2 gap-2 mt-4">
-                  {location?.schedules?.map((schedule, index) => (
-                    <div key={index} className="flex flex-col">
-                      <div className="text-xl font-semibold text-[#333333]">
-                        {schedule.weekdays}
+                  <div className="mt-1 font-semibold text-2xl text-[#333333]">
+                    {location.title}
+                  </div>
+                  {"opened" in location ? (
+                    <>
+                      <div className="h-[2px] w-full flex bg-gray-300 my-3" />
+                      <div
+                        className="text-gray-500 mt-3 text-sm"
+                        dangerouslySetInnerHTML={{ __html: location.content }}
+                      />
+                      <div className="flex flex-row justify-between gap-2 mt-3">
+                        <Image
+                          alt="mask-icon"
+                          src={`/images/${getImageSrc(
+                            "mask",
+                            location.mask
+                          )}.png`}
+                          width={60}
+                          height={60}
+                        />
+                        <Image
+                          alt="towel-icon"
+                          src={`/images/${getImageSrc(
+                            "towel",
+                            location.towel
+                          )}.png`}
+                          width={60}
+                          height={60}
+                        />
+                        <Image
+                          alt="fountain-icon"
+                          src={`/images/${getImageSrc(
+                            "fountain",
+                            location.fountain
+                          )}.png`}
+                          width={60}
+                          height={60}
+                        />
+                        <Image
+                          alt="lockerroom-icon"
+                          src={`/images/${getImageSrc(
+                            "locker_room",
+                            location.locker_room
+                          )}.png`}
+                          width={60}
+                          height={60}
+                        />
                       </div>
-                      <div className="text-gray-500 text-sm">
-                        {schedule.hour}
-                      </div>
+                    </>
+                  ) : (
+                    <div className="text-sm text-gray-500 mt-4">
+                      {location.street} {location.region} {location.city_name}{" "}
+                      {location.state_name} {location.uf}
                     </div>
-                  ))}
+                  )}
+                  <div className="grid grid-cols-2 gap-2 mt-4">
+                    {location?.schedules?.map((schedule, index) => (
+                      <div key={index} className="flex flex-col">
+                        <div className="text-xl font-semibold text-[#333333]">
+                          {schedule.weekdays}
+                        </div>
+                        <div className="text-gray-500 text-sm">
+                          {schedule.hour}
+                        </div>
+                      </div>
+                    ))}
+                  </div>
                 </div>
-              </div>
-            );
-          })}
-        </div>
+              );
+            })}
+          </div>
+        )}
       </div>
 
       <Footer />
