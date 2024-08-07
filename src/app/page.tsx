@@ -246,11 +246,11 @@ export default function Home() {
                   </div>
                   {"opened" in location ? (
                     <>
-                      <div className="h-[2px] w-full flex bg-gray-300 my-3" />
                       <div
                         className="text-gray-500 mt-3 text-sm"
                         dangerouslySetInnerHTML={{ __html: location.content }}
                       />
+                      <div className="h-[2px] w-full flex bg-gray-300 my-3" />
                       <div className="flex flex-row justify-between gap-2 mt-3">
                         <Image
                           alt="mask-icon"
